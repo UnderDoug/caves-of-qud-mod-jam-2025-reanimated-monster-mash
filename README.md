@@ -20,7 +20,7 @@ This version of the pack is for the 1.0.4 release (build 210.X) of Caves of Qud.
 Please refer to the Caves of Qud Wiki for [mod installation instructions](https://wiki.cavesofqud.com/wiki/Modding:Installing_a_mod).
 
 ## Updates & Fixes
-We will provide hands-on assistance with updating and fixing mods in the pack until the end of 2025. After then, pull requests with updates will be accepted (pending maintainer availability).
+We are not currently planning on updating this pack further, though we may incorporate pull requests.
 
 ## License
 This mod pack has been licensed under Creative Commons Zero v1.0 Universal.
