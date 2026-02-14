@@ -12,6 +12,7 @@ using XRL.CharacterBuilds.Qud;
 
 using static UD_FleshGolems.Const;
 using Options = UD_FleshGolems.Options;
+using XRL.World;
 
 namespace UD_FleshGolems
 {
@@ -81,6 +82,15 @@ namespace UD_FleshGolems
             return output;
         }
 
+        public static bool EitherNull<T1, T2>(T1 x, T2 y, out bool AreEqual)
+        {
+            AreEqual = (x is null) == (y is null);
+            if (x is null || y is null)
+                return true;
+
+            return false;
+        }
+
         public static string AppendTick(string String, bool WithSpaceAfter = true)
         {
             return String + "[" + TICK + "]" + (WithSpaceAfter ? " " : "");
@@ -93,5 +103,11 @@ namespace UD_FleshGolems
         {
             return String + "[" + (Yeh ? TICK : CROSS) + "]" + (WithSpaceAfter ? " " : "");
         }
+
+        public static int CapDamageTo1HPRemaining(GameObject Creature, int DamageAmount)
+            => (Creature == null
+                || Creature.GetStat("Hitpoints") is not Statistic hitpoints)
+            ? 0
+            : Math.Max(0, Math.Min(hitpoints.Value - 1, DamageAmount));
     }
 }

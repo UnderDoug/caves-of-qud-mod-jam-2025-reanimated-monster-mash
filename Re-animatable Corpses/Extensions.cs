@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 
 using XRL.CharacterBuilds.Qud;
@@ -16,9 +17,35 @@ namespace UD_FleshGolems
     public static class Extensions
     {
         public static bool IsPlayerBlueprint(this string Blueprint)
+            => Blueprint == Startup.PlayerBlueprint;
+
+        public static bool HasPlayerBlueprint(this GameObject Entity)
         {
-            return Blueprint == Startup.PlayerBlueprint;
+            if (Entity.Blueprint.IsPlayerBlueprint())
+            {
+                Startup.PlayerID ??= Entity.ID;
+                return true;
+            }
+            return false;
         }
+
+        public static bool HasPlayerID(this GameObject Entity)
+            => Entity.ID == Startup.PlayerID;
+
+        public static bool IsPlayerDuringWorldGen(this GameObject Entity)
+            => Entity.HasPlayerID()
+            || Entity.HasPlayerBlueprint()
+            || Entity.IsPlayer();
+
+        public static bool EqualIncludingBothNull<T>(this T Operand1, T Operand2)
+            => (Utils.EitherNull(Operand1, Operand2, out bool areEqual)
+                  && areEqual)
+            || (Operand1 != null
+                && Operand1.Equals(Operand2));
+
+        public static bool EqualsAny<T>(this T Value, params T[] args)
+            => !args.IsNullOrEmpty()
+            && !args.Where(t => t.EqualIncludingBothNull(Value)).IsNullOrEmpty();
 
         public static string ThisManyTimes(this string @string, int Times = 1)
         {
@@ -117,5 +144,10 @@ namespace UD_FleshGolems
             }
             return targetMatches >= matches;
         }
+
+        public static bool InheritsFromAny(this GameObjectBlueprint Blueprint, params string[] BaseBlueprints)
+            => Blueprint != null
+            && !BaseBlueprints.IsNullOrEmpty()
+            && BaseBlueprints.Any(bb => Blueprint.InheritsFrom(bb));
     }
 }
