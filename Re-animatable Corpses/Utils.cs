@@ -1,14 +1,11 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Text;
 
 using XRL;
+using XRL.CharacterBuilds;
+using XRL.CharacterBuilds.Qud;
 using XRL.Language;
 using XRL.World.Text.Attributes;
 using XRL.World.Text.Delegates;
-using XRL.CharacterBuilds;
-using XRL.CharacterBuilds.Qud;
 
 using static UD_FleshGolems.Const;
 using Options = UD_FleshGolems.Options;
@@ -45,40 +42,11 @@ namespace UD_FleshGolems
         {
             string nbsp = "\xFF";
             string output = nbsp;
-            if (!Context.Parameters.IsNullOrEmpty() && int.TryParse(Context.Parameters[0], out int count))
-            {
+            if (!Context.Parameters.IsNullOrEmpty()
+                && int.TryParse(Context.Parameters[0], out int count))
                 for (int i = 1; i < count; i++)
-                {
                     output += nbsp;
-                }
-            }
-            return output;
-        }
 
-        [VariableReplacer]
-        public static string ud_weird(DelegateContext Context)
-        {
-            string output = null;
-            if (!Context.Parameters.IsNullOrEmpty())
-            {
-                if (Context.Parameters.Count > 1)
-                {
-                    output = "{{" + Context.Parameters[0] + "|";
-                    for (int i = 1; i < Context.Parameters.Count; i++)
-                    {
-                        if (i > 1)
-                        {
-                            output += " ";
-                        }
-                        output += TextFilters.Weird(Context.Parameters[i]);
-                    }
-                    output += "}}";
-                }
-                else
-                {
-                    return TextFilters.Weird(Context.Parameters[0]);
-                }
-            }
             return output;
         }
 
@@ -92,22 +60,19 @@ namespace UD_FleshGolems
         }
 
         public static string AppendTick(string String, bool WithSpaceAfter = true)
-        {
-            return String + "[" + TICK + "]" + (WithSpaceAfter ? " " : "");
-        }
+            => String + "[" + TICK + "]" + (WithSpaceAfter ? " " : "");
+
         public static string AppendCross(string String, bool WithSpaceAfter = true)
-        {
-            return String + "[" + CROSS + "]" + (WithSpaceAfter ? " " : "");
-        }
+            => String + "[" + CROSS + "]" + (WithSpaceAfter ? " " : "");
+
         public static string AppendYehNah(string String, bool Yeh, bool WithSpaceAfter = true)
-        {
-            return String + "[" + (Yeh ? TICK : CROSS) + "]" + (WithSpaceAfter ? " " : "");
-        }
+            => Yeh
+            ? AppendTick(String, WithSpaceAfter)
+            : AppendCross(String, WithSpaceAfter);
 
         public static int CapDamageTo1HPRemaining(GameObject Creature, int DamageAmount)
-            => (Creature == null
-                || Creature.GetStat("Hitpoints") is not Statistic hitpoints)
-            ? 0
-            : Math.Max(0, Math.Min(hitpoints.Value - 1, DamageAmount));
+            => (Creature?.GetStat("Hitpoints") is Statistic hitpoints)
+            ? Math.Clamp(hitpoints.Value - 1, 0, DamageAmount)
+            : 0;
     }
 }
