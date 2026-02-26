@@ -20,21 +20,15 @@ namespace UD_FleshGolems
 
         public static string GetPlayerBlueprint()
         {
-            if (!EmbarkBuilderConfiguration.activeModules.IsNullOrEmpty())
-            {
-                foreach (AbstractEmbarkBuilderModule activeModule in EmbarkBuilderConfiguration.activeModules)
-                {
-                    if (activeModule.type == nameof(QudSpecificCharacterInitModule))
-                    {
-                        QudSpecificCharacterInitModule characterInit = activeModule as QudSpecificCharacterInitModule;
-                        string blueprint = characterInit?.builder?.GetModule<QudGenotypeModule>()?.data?.Entry?.BodyObject
-                            ?? characterInit?.builder?.GetModule<QudSubtypeModule>()?.data?.Entry?.BodyObject
-                            ?? "Humanoid";
-                        return characterInit?.builder?.info?.fireBootEvent(QudGameBootModule.BOOTEVENT_BOOTPLAYEROBJECTBLUEPRINT, The.Game, blueprint);
-                    }
-                }
-            }
-            return null;
+            var builder = GameManager.Instance.gameObject.GetComponent<EmbarkBuilder>();
+            if (builder is null)
+                return null;
+
+            var body = builder.GetModule<QudGenotypeModule>()?.data?.Entry?.BodyObject
+                .Coalesce(builder.GetModule<QudSubtypeModule>()?.data?.Entry?.BodyObject)
+                .Coalesce("Humanoid");
+
+            return builder.info?.fireBootEvent(QudGameBootModule.BOOTEVENT_BOOTPLAYEROBJECTBLUEPRINT, The.Game, body);
         }
 
         [VariableReplacer]
