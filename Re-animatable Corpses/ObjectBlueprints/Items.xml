@@ -135,6 +135,36 @@
   
   <!--
   
+  World-Gen Exception fixes
+  
+  -->
+  <object Name="Dreadroot Tuber" Load="Merge">
+    <removepart Name="UD_FleshGolems_CorpseReanimationHelper" />
+    <removetag Name="Animatable" />
+  </object>
+  <object Name="Albino Ape Heart" Load="Merge">
+    <removepart Name="UD_FleshGolems_CorpseReanimationHelper" />
+    <removetag Name="Animatable" />
+  </object>
+  <object Name="Ogre Ape Heart" Load="Merge">
+    <removepart Name="UD_FleshGolems_CorpseReanimationHelper" />
+    <removetag Name="Animatable" />
+  </object>
+  <object Name="Black Puma Haunch" Load="Merge">
+    <removepart Name="UD_FleshGolems_CorpseReanimationHelper" />
+    <removetag Name="Animatable" />
+  </object>
+  <object Name="Lovers_Thorns" Load="Merge">
+    <removepart Name="UD_FleshGolems_CorpseReanimationHelper" />
+    <removetag Name="Animatable" />
+  </object>
+  <object Name="Lagroot Tuber" Load="Merge">
+    <removepart Name="UD_FleshGolems_CorpseReanimationHelper" />
+    <removetag Name="Animatable" />
+  </object>
+  
+  <!--
+  
   Loot-box Corpses & Limbs
   
   -->
