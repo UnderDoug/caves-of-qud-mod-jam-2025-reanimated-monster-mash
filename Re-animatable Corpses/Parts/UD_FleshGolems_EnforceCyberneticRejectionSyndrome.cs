@@ -82,7 +82,7 @@ namespace XRL.World.Parts
             if (!InstalledCybernetic.TryGetPart(out CyberneticsBaseItem cyberneticsBaseItemPart))
                 return false;
 
-            cRS.Reduce(cyberneticsBaseItemPart.Cost);
+            cRS.Reduce((int)Math.Ceiling(cyberneticsBaseItemPart.Cost * CostStackMultiplier));
 
             return true;
         }
