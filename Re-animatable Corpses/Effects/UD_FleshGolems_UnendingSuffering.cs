@@ -169,18 +169,14 @@ namespace XRL.World.Effects
         public void Initialize(int Tier, int TimesReanimated = 1)
         {
             Tier = Capabilities.Tier.Constrain(Stat.Random(Tier - 1, Tier + 1));
-
-            if (Tier >= 7)
-                Damage = "3-4";
-            else
-            if (Tier >= 5)
-                Damage = "2-3";
-            else
-            if (Tier >= 3)
-                Damage = "1-2";
-            else
-            if (Tier >= 1)
-                Damage = "1d3-2";
+            
+            Damage = Tier switch
+            {
+                >= 7 => "3-4",
+                >= 5 => "2-3",
+                >= 3 => "1-2",
+                _    => "1d3-2"
+            };
 
             ChanceToDamage = 3 * (1 + Math.Max(1, Tier));
 
