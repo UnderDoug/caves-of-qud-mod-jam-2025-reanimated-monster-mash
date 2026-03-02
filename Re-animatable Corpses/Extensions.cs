@@ -45,7 +45,7 @@ namespace UD_FleshGolems
 
         public static bool EqualsAny<T>(this T Value, params T[] args)
             => !args.IsNullOrEmpty()
-            && !args.Where(t => t.EqualIncludingBothNull(Value)).IsNullOrEmpty();
+            && args.Contains(Value);
 
         public static string ThisManyTimes(this string @string, int Times = 1)
         {
