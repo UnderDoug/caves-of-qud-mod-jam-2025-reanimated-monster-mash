@@ -96,7 +96,7 @@ namespace XRL.World.Effects
 
         public UD_FleshGolems_UnendingSuffering()
         {
-            _FrameOffset = int.MinValue;
+            _FrameOffset = null;
             _FlipRenderColors = null;
 
             _ColorLatch = false;
