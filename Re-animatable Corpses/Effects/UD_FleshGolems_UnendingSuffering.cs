@@ -248,8 +248,7 @@ namespace XRL.World.Effects
 
         public void Suffer()
         {
-            if (Object == null
-                || Object.CurrentCell == null)
+            if (Object?.CurrentCell == null)
                 return;
 
             int permyriadChanceToDamage = ChanceToDamage * 100;
