@@ -257,7 +257,7 @@ namespace XRL.World.Parts
 
         public static bool TileMappingTagExistsAndContainsLookup(string ParameterString, out List<string> Parameters, params string[] Lookup)
         {
-            Parameters = new();
+            Parameters = null;
             return !ParameterString.IsNullOrEmpty()
                 && !Lookup.IsNullOrEmpty()
                 && !(Parameters = ParameterString.CachedCommaExpansion().ToList()).IsNullOrEmpty()
