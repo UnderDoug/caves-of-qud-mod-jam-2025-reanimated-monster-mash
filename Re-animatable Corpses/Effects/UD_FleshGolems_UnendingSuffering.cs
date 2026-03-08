@@ -151,7 +151,7 @@ namespace XRL.World.Effects
         public void Initialize(int Tier, int TimesReanimated = 1)
         {
             Tier = Capabilities.Tier.Constrain(Stat.Random(Tier - 1, Tier + 1));
-            
+
             Damage = Tier switch
             {
                 >= 7 => "3-4",
