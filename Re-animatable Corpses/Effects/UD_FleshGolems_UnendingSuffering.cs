@@ -41,15 +41,11 @@ namespace XRL.World.Effects
         {
             get
             {
-                if (_FlipRenderColors != null)
-                return _FlipRenderColors.GetValueOrDefault();
+                _FlipRenderColors ??= int.TryParse(Object?.ID, out int result)
+                    ? (result % 2) == 0
+                    : null;
 
-                if (Object != null && int.TryParse(Object.ID, out int result))
-                {
-                    _FlipRenderColors = (result % 2) == 0;
-                    return _FlipRenderColors.GetValueOrDefault();
-                }
-                return Stat.RollCached("1d2") == 1;
+                return _FlipRenderColors ?? Stat.Random(1, 2) == 1;
             }
         }
 
