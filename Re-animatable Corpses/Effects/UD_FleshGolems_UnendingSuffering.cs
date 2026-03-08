@@ -298,8 +298,7 @@ namespace XRL.World.Effects
                     AutoAct.Setting = oldAutoActSetting;
             }
 
-            if (Object.CurrentCell is not Cell suferrerCell
-                || suferrerCell.OnWorldMap())
+            if (Object.CurrentCell.OnWorldMap())
                 return;
 
             bool inLiquid = false;
