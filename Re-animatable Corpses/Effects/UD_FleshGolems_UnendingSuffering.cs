@@ -22,17 +22,16 @@ namespace XRL.World.Effects
         public const string ENDLESSLY_SUFFERING = "{{UD_FleshGolems_reanimated|endlessly suffering}}";
 
         [SerializeField]
-        private int _FrameOffset;
+        private int? _FrameOffset;
         private int FrameOffset
         {
             get
             {
-                if (_FrameOffset <= int.MinValue)
-                    return (Object != null && int.TryParse(Object.ID, out int result))
-                        ? _FrameOffset = (result % FrameOffsetMod) + 1
-                        : Stat.RollCached("1d" + FrameOffsetMod);
-                    
-                return _FrameOffset;
+                _FrameOffset ??= int.TryParse(Object?.ID, out int result)
+                    ? (result % FrameOffsetMod) + 1
+                    : null;
+
+                return _FrameOffset ?? Stat.Random(1, FrameOffsetMod);
             }
         }
 
