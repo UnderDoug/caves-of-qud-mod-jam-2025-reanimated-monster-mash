@@ -139,5 +139,9 @@ namespace UD_FleshGolems
             => Blueprint != null
             && !BaseBlueprints.IsNullOrEmpty()
             && BaseBlueprints.Any(bb => Blueprint.InheritsFrom(bb));
+
+        public static bool HasTextFragments(this GameObject Object)
+            => Object?.GetBlueprint()?.xTags?.GetValue("TextFragments") is Dictionary<string, string> textFragments
+            && !textFragments.IsNullOrEmpty();
     }
 }
