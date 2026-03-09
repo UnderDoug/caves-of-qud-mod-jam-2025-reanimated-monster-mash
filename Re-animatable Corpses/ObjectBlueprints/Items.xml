@@ -12,10 +12,18 @@
     <tag Name="BodyType" Value="Humanoid" />
     <xtagTextFragments
       Skin="leather"
-      PoeticFeatures="viscera,muck,entrails,sinew,bone"
+      PoeticFeatures="cracked teeth,sparse hair,glassy eyes,exposed muscle,exposed bone,unnaturally bent limbs"
       PoeticVerbs="squirming,wriggling,squelching"
       PoeticAdjectives="wet,moist,meaty"
-      PoeticnNoises="gurgles,slurps,squelches" />
+      PoeticnNoises="gurgles,slurps,squelches"
+      YounglingNoise="*wilhelm scream*"
+      Activity="suffering endlessly"
+      VillageActivity="steeping in perpetual existential pain"
+      NeedsItemFor="to persue oblivion,because I want it,because it was mine while I lived,just to have,because it would ease my suffering,for secret reasons I won't tell you"
+      SacredThing="oblivion,a way to cease the endless suffering,the answer to why this was allowed to happen"
+      ArableLand="a place to truly belong,the bottom of a ditch"
+      ValuedOre="b... brains?..,answers to existential questions" />
+    <stag Name="HardMaterial" Value="bone" />
     <tag Name="AnimatedSkills" Value="CookingAndGathering,CookingAndGathering_Butchery,Persuasion_Intimidate,Multiweapon_Fighting,ShortBlades,Axe,Cudgel,LongBlades" />
     <tag Name="UD_FleshGolems LimbType" Value="*"/>
     <tag Name="UD_FleshGolems CyberneticsSlot" Value="*"/>
