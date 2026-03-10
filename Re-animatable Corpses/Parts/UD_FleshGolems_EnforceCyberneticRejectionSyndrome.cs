@@ -42,7 +42,11 @@ namespace XRL.World.Parts
             return chance;
         }
 
-        public static bool ProcessCybernetic(GameObject Implantee, GameObject InstalledCybernetic, double CostStackMultiplier = 1.0)
+        public static bool ProcessCybernetic(
+            GameObject Implantee,
+            GameObject InstalledCybernetic,
+            double CostStackMultiplier = 1.0
+            )
         {
             if (!InstalledCybernetic.TryGetPart(out CyberneticsBaseItem cyberneticsBaseItemPart))
                 return false;
@@ -70,7 +74,11 @@ namespace XRL.World.Parts
         public bool ProcessCybernetic(GameObject InstalledCybernetic)
             => ProcessCybernetic(ParentObject, InstalledCybernetic);
 
-        public static bool UnprocessCybernetic(GameObject Implantee, GameObject InstalledCybernetic)
+        public static bool UnprocessCybernetic(
+            GameObject Implantee,
+            GameObject InstalledCybernetic,
+            double CostStackMultiplier = 1.0
+            )
         {
             string cRS_Key = CyberneticsBaseItem.GetCyberneticRejectionSyndromeKey(Implantee);
             if (InstalledCybernetic.GetIntProperty(cRS_Key) < 1)
@@ -82,12 +90,12 @@ namespace XRL.World.Parts
             if (!InstalledCybernetic.TryGetPart(out CyberneticsBaseItem cyberneticsBaseItemPart))
                 return false;
 
-            cRS.Reduce(cyberneticsBaseItemPart.Cost);
+            cRS.Reduce((int)Math.Ceiling(cyberneticsBaseItemPart.Cost * CostStackMultiplier));
 
             return true;
         }
         public bool UnprocessCybernetic(GameObject InstalledCybernetic)
-            => UnprocessCybernetic(ParentObject, InstalledCybernetic);
+            => UnprocessCybernetic(ParentObject, InstalledCybernetic, CostStackMultiplier);
 
         public override bool AllowStaticRegistration() => true;
 
