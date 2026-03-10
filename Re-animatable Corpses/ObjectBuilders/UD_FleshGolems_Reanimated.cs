@@ -404,16 +404,17 @@ namespace XRL.World.ObjectBuilders
         public static bool PerformAFakeDeath(
             GameObject Entity,
             GameObject Corpse,
-            IDeathEvent DeathEvent = null)
+            IDeathEvent DeathEvent = null,
+            Renderable CorpseIcon = null)
         {
             if (Entity == null
                 || Corpse == null)
                 return false;
 
             if (DeathEvent == null)
-                return UD_FleshGolems_DestinedForReanimation.FakeRandomDeath(Entity);
+                return UD_FleshGolems_DestinedForReanimation.FakeRandomDeath(Entity, CorpseIcon: CorpseIcon);
 
-            return UD_FleshGolems_DestinedForReanimation.FakeDeath(Entity, DeathEvent, DoAchievement: true);
+            return UD_FleshGolems_DestinedForReanimation.FakeDeath(Entity, DeathEvent, DoAchievement: true, CorpseIcon: CorpseIcon);
         }
 
         public static bool ReplaceEntityWithCorpse(
@@ -457,12 +458,11 @@ namespace XRL.World.ObjectBuilders
             try
             {
                 if (FakeDeath)
-                    PerformAFakeDeath(Entity, Corpse, DeathEvent);
+                    PerformAFakeDeath(Entity, Corpse, DeathEvent, CorpseIcon: new(Corpse.RenderForUI()));
 
                 ReplaceInContextEvent.Send(Entity, Corpse);
 
-                if (Entity.IsPlayer()
-                    || Entity.IsPlayerDuringWorldGen())
+                if (Entity.IsPlayerDuringWorldGen())
                 {
                     The.Game.Player.SetBody(Corpse);
 

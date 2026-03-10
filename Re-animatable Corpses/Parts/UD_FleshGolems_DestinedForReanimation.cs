@@ -17,6 +17,7 @@ using UD_FleshGolems;
 using static UD_FleshGolems.Const;
 using XRL.World.Parts.Mutation;
 using System.Linq;
+using XRL.Collections;
 
 namespace XRL.World.Parts
 {
@@ -56,7 +57,8 @@ namespace XRL.World.Parts
             string ThirdPersonReason = null,
             bool DoFakeMessage = true,
             bool DoJournal = true,
-            bool DoAchievement = false
+            bool DoAchievement = false,
+            Renderable CorpseIcon = null
             )
         {
             if (Dying == null)
@@ -86,7 +88,7 @@ namespace XRL.World.Parts
                 Reason: Reason,
                 ThirdPersonReason: ThirdPersonReason);
 
-            string deathMessage = "You died.\n\n You were " + (Reason ?? The.Game.DeathReason) + ".";
+            string deathMessage = "You died.\n\nYou were " + (Reason ?? The.Game.DeathReason) + ".";
             string deathCategory = The.Game.DeathCategory;
             Dictionary<string, Renderable> deathIcons = CheckpointingSystem.deathIcons;
             string deathMessageTitle = "";
@@ -98,14 +100,15 @@ namespace XRL.World.Parts
                 deathMessage = deathMessage[messageSubstring..];
             }
             Renderable deathIcon = null;
-            if (!deathCategory.IsNullOrEmpty() && deathIcons.ContainsKey(deathCategory))
+            if (!Reason.IsNullOrEmpty()
+                && deathIcons.ContainsKey(Reason))
             {
                 deathMessage = deathMessage.Replace("You died.", "");
-                deathIcon = deathIcons[deathCategory];
+                deathIcon = deathIcons[Reason];
             }
+            deathIcon ??= GameObjectFactory.Factory.GetBlueprintIfExists("Crowsong")?.GetRenderable();
             if (DoFakeMessage
-                && (Dying.IsPlayer()
-                    || Dying.IsPlayerDuringWorldGen()))
+                && Dying.IsPlayerDuringWorldGen())
             {
                 Popup.ShowSpace(
                     Message: deathMessage,
@@ -116,10 +119,9 @@ namespace XRL.World.Parts
                     ShowContextFrame: deathIcon != null,
                     PopupID: "DeathMessage");
 
-                IRenderable playerIcon = Dying.RenderForUI();
                 Popup.ShowSpace(
                     Message: "... and yet...\n\n=ud_nbsp:12=...You don't {{UD_FleshGolems_reanimated|relent}}.".StartReplace().ToString(),
-                    AfterRender: deathIcon != null ? (Renderable)playerIcon : null,
+                    AfterRender: deathIcon != null ? CorpseIcon : null,
                     LogMessage: true,
                     ShowContextFrame: deathIcon != null,
                     PopupID: "DeathMessage");
@@ -172,7 +174,8 @@ namespace XRL.World.Parts
             IDeathEvent E,
             bool DoFakeMessage = true,
             bool DoJournal = true,
-            bool DoAchievement = false
+            bool DoAchievement = false,
+            Renderable CorpseIcon = null
             )
             => FakeDeath(
                 Dying: Dying,
@@ -186,7 +189,8 @@ namespace XRL.World.Parts
                 ThirdPersonReason: E?.ThirdPersonReason,
                 DoFakeMessage: DoFakeMessage,
                 DoJournal: DoJournal,
-                DoAchievement: DoAchievement);
+                DoAchievement: DoAchievement,
+                CorpseIcon: CorpseIcon);
 
         public bool FakeDeath(IDeathEvent E)
             => FakeDeath(ParentObject, E);
@@ -194,7 +198,12 @@ namespace XRL.World.Parts
         public bool FakeDeath()
             => FakeDeath(null);
 
-        public static bool FakeRandomDeath(GameObject Dying, int ChanceRandomKiller = 50, bool DoAchievement = false)
+        public static bool FakeRandomDeath(
+            GameObject Dying,
+            int ChanceRandomKiller = 50,
+            bool DoAchievement = false,
+            Renderable CorpseIcon = null
+            )
         {
             GameObject killer = null;
             GameObject weapon = null;
@@ -230,7 +239,13 @@ namespace XRL.World.Parts
                             projectile = GameObject.CreateSample(EncountersAPI.GetAnItemBlueprint(GO => GO.HasPart(ammoPart)));
                     }
                 }
-                string reason = CheckpointingSystem.deathIcons.Keys.GetRandomElement();
+                var reasonExclusions = new List<string>
+                {
+                    "exit",
+                    "quit",
+                    "CROWSONG"
+                };
+                string reason = CheckpointingSystem.deathIcons.Keys.Where(s => !reasonExclusions.Contains(s)).GetRandomElement();
                 bool accidental = Stat.RollCached("1d2") == 1;
 
                 bool deathFaked = FakeDeath(
@@ -241,7 +256,8 @@ namespace XRL.World.Parts
                     Accidental: accidental,
                     Reason: reason,
                     ThirdPersonReason: reason,
-                    DoAchievement: DoAchievement);
+                    DoAchievement: DoAchievement,
+                    CorpseIcon: CorpseIcon);
 
                 killer?.Obliterate();
                 weapon?.Obliterate();
@@ -344,8 +360,7 @@ namespace XRL.World.Parts
             if (ParentObject is not GameObject player
                 || !PlayerWantsFakeDie
                 || HaveFakedDeath
-                || (!player.IsPlayer()
-                    && !player.IsPlayerDuringWorldGen()))
+                || !player.IsPlayerDuringWorldGen())
                 return false;
 
             bool success = UD_FleshGolems_Reanimated.ReplaceEntityWithCorpse(
@@ -465,7 +480,7 @@ namespace XRL.World.Parts
                 && BuiltToBeReanimated
                 && PlayerWantsFakeDie
                 && !ActuallyDoTheFakeDieAndReanimate())
-                if (UD_FleshGolems_Reanimated.PerformAFakeDeath(ParentObject, Corpse, null))
+                if (UD_FleshGolems_Reanimated.PerformAFakeDeath(ParentObject, Corpse, null, Corpse != null ? new(Corpse?.RenderForUI()) : null))
                     if (ParentObject.GetBlueprint() is var objectBlueprint
                         && (objectBlueprint.InheritsFrom("Corpse")
                             || objectBlueprint.Name == "Corpse"))
