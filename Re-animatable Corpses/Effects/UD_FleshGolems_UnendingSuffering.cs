@@ -23,11 +23,36 @@ namespace XRL.World.Effects
 
         [SerializeField]
         private int _FrameOffset;
-        private int FrameOffset => GetFrameOffset();
+        private int FrameOffset
+        {
+            get
+            {
+                if (_FrameOffset > int.MinValue)
+                    return _FrameOffset;
+
+                return (Object != null && int.TryParse(Object.ID, out int result))
+                    ? _FrameOffset = (result % FrameOffsetMod) + 1
+                    : Stat.RollCached("1d" + FrameOffsetMod);
+            }
+        }
 
         [SerializeField]
         private bool? _FlipRenderColors;
-        private bool FlipRenderColors => GetFlipRenderColors();
+        private bool FlipRenderColors
+        {
+            get
+            {
+                if (_FlipRenderColors != null)
+                    return _FlipRenderColors.GetValueOrDefault();
+
+                if (Object != null && int.TryParse(Object.ID, out int result))
+                {
+                    _FlipRenderColors = (result % 2) == 0;
+                    return _FlipRenderColors.GetValueOrDefault();
+                }
+                return Stat.RollCached("1d2") == 1;
+            }
+        }
 
         private bool _ColorLatch;
         private bool ColorLatch
@@ -126,29 +151,6 @@ namespace XRL.World.Effects
             this.ChanceToSpatter = ChanceToSpatter;
 
             this.Duration = Duration;
-        }
-
-        public int GetFrameOffset()
-        {
-            if (_FrameOffset > int.MinValue)
-                return _FrameOffset;
-
-            return (Object != null && int.TryParse(Object.ID, out int result))
-                ? _FrameOffset = (result % FrameOffsetMod) + 1
-                : Stat.RollCached("1d" + FrameOffsetMod);
-        }
-
-        public bool GetFlipRenderColors()
-        {
-            if (_FlipRenderColors != null)
-                return _FlipRenderColors.GetValueOrDefault();
-
-            if (Object != null && int.TryParse(Object.ID, out int result))
-            {
-                _FlipRenderColors = (result % 2) == 0;
-                return _FlipRenderColors.GetValueOrDefault();
-            }
-            return Stat.RollCached("1d2") == 1;
         }
 
         public void Initialize(int Tier, int TimesReanimated = 1)
@@ -259,20 +261,20 @@ namespace XRL.World.Effects
                 || Object.CurrentCell == null)
                 return;
 
-            int chanceToDamage = ChanceToDamage * 100;
+            int permyriadChanceToDamage = ChanceToDamage * 100;
             if (Object.CurrentCell.OnWorldMap() || Options.GreatlyReduceSuffering)
-                chanceToDamage = (int)Math.Max(1, chanceToDamage * 0.01);
+                permyriadChanceToDamage = (int)Math.Max(1, permyriadChanceToDamage * 0.01);
 
-            int chanceToSmear = ChanceToSmear * 100;
+            int permyriadChanceToSmear = ChanceToSmear * 100;
             if (Options.GreatlyReduceSuffering)
-                chanceToSmear = (int)Math.Max(1, chanceToSmear * 0.01);
+                permyriadChanceToSmear = (int)Math.Max(1, permyriadChanceToSmear * 0.01);
 
-            int chanceToSpatter = ChanceToSpatter * 100;
+            int permyriadChanceToSpatter = ChanceToSpatter * 100;
             if (Options.GreatlyReduceSuffering)
-                chanceToSpatter = (int)Math.Max(1, chanceToSpatter * 0.01);
+                permyriadChanceToSpatter = (int)Math.Max(1, permyriadChanceToSpatter * 0.01);
 
             bool tookDamage = false;
-            if (chanceToDamage.in10000())
+            if (permyriadChanceToDamage.in10000())
             {
                 string oldAutoActSetting = AutoAct.Setting;
                 bool isAutoActing = AutoAct.IsActive();
@@ -314,17 +316,12 @@ namespace XRL.World.Effects
             string bleedLiquid = Object.GetBleedLiquid();
 
             foreach (GameObject renderdObject in suferrerCell.GetObjectsWithPartReadonly("Render"))
-                if (chanceToSmear.in10000())
+                if (permyriadChanceToSmear.in10000())
                 {
                     if (renderdObject.LiquidVolume is LiquidVolume liquidVolumeInCell
                         && liquidVolumeInCell.IsOpenVolume())
                     {
-                        LiquidVolume bloodVolumeForCell = new()
-                        {
-                            InitialLiquid = bleedLiquid,
-                            Volume = 2
-                        };
-                        liquidVolumeInCell.MixWith(bloodVolumeForCell, null, null, null);
+                        liquidVolumeInCell.MixWith(new(bleedLiquid, 2));
                         inLiquid = true;
                     }
                     else
@@ -332,7 +329,7 @@ namespace XRL.World.Effects
                 }
 
             if (!inLiquid
-                && chanceToSpatter.in10000()
+                && permyriadChanceToSpatter.in10000()
                 && GameObject.Create("BloodSplash") is GameObject bloodySplashObject)
             {
                 if (bloodySplashObject.LiquidVolume is LiquidVolume bloodSplashVolume)
