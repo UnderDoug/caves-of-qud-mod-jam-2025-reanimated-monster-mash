@@ -1,17 +1,12 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Text;
 
 using XRL;
-using XRL.Language;
-using XRL.World.Text.Attributes;
-using XRL.World.Text.Delegates;
 using XRL.CharacterBuilds;
 using XRL.CharacterBuilds.Qud;
+using XRL.World.Text.Attributes;
+using XRL.World.Text.Delegates;
 
 using static UD_FleshGolems.Const;
-using Options = UD_FleshGolems.Options;
 using XRL.World;
 
 namespace UD_FleshGolems
@@ -23,21 +18,15 @@ namespace UD_FleshGolems
 
         public static string GetPlayerBlueprint()
         {
-            if (!EmbarkBuilderConfiguration.activeModules.IsNullOrEmpty())
-            {
-                foreach (AbstractEmbarkBuilderModule activeModule in EmbarkBuilderConfiguration.activeModules)
-                {
-                    if (activeModule.type == nameof(QudSpecificCharacterInitModule))
-                    {
-                        QudSpecificCharacterInitModule characterInit = activeModule as QudSpecificCharacterInitModule;
-                        string blueprint = characterInit?.builder?.GetModule<QudGenotypeModule>()?.data?.Entry?.BodyObject
-                            ?? characterInit?.builder?.GetModule<QudSubtypeModule>()?.data?.Entry?.BodyObject
-                            ?? "Humanoid";
-                        return characterInit?.builder?.info?.fireBootEvent(QudGameBootModule.BOOTEVENT_BOOTPLAYEROBJECTBLUEPRINT, The.Game, blueprint);
-                    }
-                }
-            }
-            return null;
+            if (EmbarkBuilder.gameObject.GetComponent<EmbarkBuilder>() is not EmbarkBuilder builder)
+                return "Humanoid";
+
+            var body = (builder.GetModule<QudGenotypeModule>()?.data?.Entry?.BodyObject)
+                .Coalesce(builder.GetModule<QudSubtypeModule>()?.data?.Entry?.BodyObject)
+                .Coalesce("Humanoid");
+
+            return (builder.info?.fireBootEvent(QudGameBootModule.BOOTEVENT_BOOTPLAYEROBJECTBLUEPRINT, The.Game, body))
+                ?.Coalesce(body);
         }
 
         [VariableReplacer]
